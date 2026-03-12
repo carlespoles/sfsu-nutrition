@@ -1,0 +1,702 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>NutriGators – SFSU Nutrition Education Program</title>
+  <style>
+    /* ── Reset & Base ── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --purple:   #4E2D7B;
+      --gold:     #D4A017;
+      --gold-lt:  #F5D76E;
+      --green:    #3D8B5E;
+      --green-lt: #E6F4ED;
+      --red:      #C0392B;
+      --red-lt:   #FDECEA;
+      --bg:       #F9F7F2;
+      --white:    #FFFFFF;
+      --text:     #2C2C2C;
+      --muted:    #666666;
+      --radius:   12px;
+      --shadow:   0 4px 20px rgba(0,0,0,0.08);
+    }
+    html { scroll-behavior: smooth; }
+    body {
+      font-family: 'Segoe UI', system-ui, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.7;
+    }
+    a { color: var(--purple); text-decoration: none; }
+    a:hover { text-decoration: underline; }
+    img { max-width: 100%; }
+
+    /* ── Nav ── */
+    nav {
+      position: sticky; top: 0; z-index: 100;
+      background: var(--purple);
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 0 2rem; height: 64px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.25);
+    }
+    .nav-brand {
+      color: var(--gold); font-size: 1.4rem; font-weight: 800;
+      letter-spacing: 1px;
+    }
+    .nav-brand span { color: var(--white); font-weight: 400; font-size: 1rem; }
+    .nav-links { display: flex; gap: 1.5rem; }
+    .nav-links a {
+      color: rgba(255,255,255,0.85); font-size: 0.9rem;
+      font-weight: 500; transition: color .2s;
+    }
+    .nav-links a:hover { color: var(--gold-lt); text-decoration: none; }
+
+    /* ── Hero ── */
+    .hero {
+      background: linear-gradient(135deg, var(--purple) 0%, #6B3FA0 60%, #3D8B5E 100%);
+      color: var(--white);
+      padding: 5rem 2rem 4rem;
+      text-align: center;
+      position: relative; overflow: hidden;
+    }
+    .hero::before {
+      content: '';
+      position: absolute; inset: 0;
+      background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.04'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+    }
+    .hero-badge {
+      display: inline-block;
+      background: var(--gold); color: var(--purple);
+      font-size: 0.75rem; font-weight: 700; letter-spacing: 2px;
+      text-transform: uppercase; padding: 4px 14px; border-radius: 50px;
+      margin-bottom: 1.2rem;
+    }
+    .hero h1 {
+      font-size: clamp(1.8rem, 4vw, 3rem);
+      font-weight: 800; line-height: 1.25;
+      max-width: 820px; margin: 0 auto 1rem;
+    }
+    .hero p {
+      font-size: 1.1rem; opacity: .88;
+      max-width: 620px; margin: 0 auto 2rem;
+    }
+    .hero-cta {
+      display: inline-flex; gap: 1rem; flex-wrap: wrap; justify-content: center;
+    }
+    .btn {
+      display: inline-block;
+      padding: 0.75rem 2rem;
+      border-radius: 50px; font-weight: 700;
+      font-size: 0.95rem; cursor: pointer;
+      transition: transform .15s, box-shadow .15s;
+      border: none;
+    }
+    .btn:hover { transform: translateY(-2px); box-shadow: 0 6px 18px rgba(0,0,0,0.2); text-decoration: none; }
+    .btn-gold  { background: var(--gold); color: var(--purple); }
+    .btn-outline { background: transparent; color: var(--white); border: 2px solid rgba(255,255,255,0.6); }
+
+    /* ── Section Wrapper ── */
+    .section { padding: 4rem 1rem; }
+    .container { max-width: 1080px; margin: 0 auto; }
+    .section-title {
+      text-align: center; font-size: 1.9rem; font-weight: 800;
+      color: var(--purple); margin-bottom: .5rem;
+    }
+    .section-sub {
+      text-align: center; color: var(--muted); font-size: 1rem;
+      margin-bottom: 2.5rem; max-width: 620px; margin-left: auto; margin-right: auto;
+    }
+    .divider {
+      width: 60px; height: 4px; background: var(--gold);
+      border-radius: 4px; margin: .5rem auto 2.5rem;
+    }
+
+    /* ── Stats Bar ── */
+    .stats-bar {
+      background: var(--purple);
+      padding: 2rem 1rem;
+    }
+    .stats-grid {
+      max-width: 1080px; margin: 0 auto;
+      display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 1.5rem; text-align: center;
+    }
+    .stat-item { color: var(--white); }
+    .stat-number {
+      font-size: 2.4rem; font-weight: 800; color: var(--gold-lt);
+      line-height: 1.1;
+    }
+    .stat-label { font-size: 0.85rem; opacity: .8; margin-top: .3rem; }
+
+    /* ── Problem Section ── */
+    .problem-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 1.5rem;
+    }
+    .problem-card {
+      background: var(--white); border-radius: var(--radius);
+      padding: 1.6rem; box-shadow: var(--shadow);
+      border-top: 4px solid var(--red);
+    }
+    .problem-card .icon { font-size: 2rem; margin-bottom: .7rem; }
+    .problem-card h3 { font-size: 1.05rem; font-weight: 700; margin-bottom: .5rem; color: var(--red); }
+    .problem-card p { font-size: .92rem; color: var(--muted); }
+
+    /* ── Program Overview ── */
+    .overview-bg { background: var(--green-lt); }
+    .modules-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 1.5rem;
+    }
+    .module-card {
+      background: var(--white); border-radius: var(--radius);
+      padding: 1.6rem; box-shadow: var(--shadow);
+      border-left: 5px solid var(--green);
+      transition: transform .2s;
+    }
+    .module-card:hover { transform: translateY(-4px); }
+    .module-week {
+      font-size: .75rem; font-weight: 700; letter-spacing: 1.5px;
+      text-transform: uppercase; color: var(--green); margin-bottom: .4rem;
+    }
+    .module-card h3 { font-size: 1.05rem; font-weight: 700; margin-bottom: .5rem; }
+    .module-card p { font-size: .88rem; color: var(--muted); }
+    .module-card ul { font-size: .88rem; color: var(--muted); padding-left: 1.1rem; margin-top: .4rem; }
+    .module-card ul li { margin-bottom: .2rem; }
+
+    /* ── Workshop Schedule ── */
+    .schedule-table {
+      width: 100%; border-collapse: collapse;
+      background: var(--white); border-radius: var(--radius);
+      overflow: hidden; box-shadow: var(--shadow);
+    }
+    .schedule-table thead { background: var(--purple); color: var(--white); }
+    .schedule-table th, .schedule-table td {
+      padding: .9rem 1.2rem; text-align: left; font-size: .9rem;
+    }
+    .schedule-table tbody tr:nth-child(even) { background: #F3EDF8; }
+    .schedule-table tbody tr:hover { background: #EAE0F5; }
+    .badge {
+      display: inline-block; font-size: .72rem; font-weight: 700;
+      padding: 2px 10px; border-radius: 50px;
+    }
+    .badge-green  { background: #D1F0E0; color: #276246; }
+    .badge-gold   { background: #FEF3CD; color: #856404; }
+    .badge-purple { background: #EDE0F8; color: #5B2A8A; }
+
+    /* ── Food Comparison ── */
+    .compare-grid {
+      display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem;
+    }
+    @media (max-width: 600px) { .compare-grid { grid-template-columns: 1fr; } }
+    .compare-card {
+      border-radius: var(--radius); padding: 1.6rem; box-shadow: var(--shadow);
+    }
+    .compare-card.processed {
+      background: var(--red-lt); border: 2px solid #E57373;
+    }
+    .compare-card.whole {
+      background: var(--green-lt); border: 2px solid #66BB6A;
+    }
+    .compare-card h3 {
+      font-size: 1.1rem; font-weight: 800; margin-bottom: .8rem;
+      display: flex; align-items: center; gap: .5rem;
+    }
+    .compare-card ul { padding-left: 1.2rem; font-size: .9rem; }
+    .compare-card ul li { margin-bottom: .4rem; }
+
+    /* ── Tips Section ── */
+    .tips-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 1.4rem;
+    }
+    .tip-card {
+      background: var(--white); border-radius: var(--radius);
+      padding: 1.5rem; box-shadow: var(--shadow); text-align: center;
+    }
+    .tip-icon { font-size: 2.5rem; margin-bottom: .7rem; }
+    .tip-card h4 { font-size: 1rem; font-weight: 700; margin-bottom: .4rem; color: var(--purple); }
+    .tip-card p { font-size: .87rem; color: var(--muted); }
+
+    /* ── Resources ── */
+    .resources-bg { background: #F0EBF8; }
+    .resources-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 1.4rem;
+    }
+    .resource-card {
+      background: var(--white); border-radius: var(--radius);
+      padding: 1.4rem; box-shadow: var(--shadow);
+      display: flex; gap: 1rem; align-items: flex-start;
+    }
+    .resource-icon {
+      font-size: 1.8rem; flex-shrink: 0;
+      width: 52px; height: 52px;
+      background: #EDE0F8; border-radius: 10px;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .resource-card h4 { font-size: .95rem; font-weight: 700; margin-bottom: .3rem; }
+    .resource-card p  { font-size: .83rem; color: var(--muted); }
+    .resource-card a  { font-size: .83rem; font-weight: 600; }
+
+    /* ── Quiz ── */
+    .quiz-box {
+      background: var(--white); border-radius: var(--radius);
+      padding: 2rem; box-shadow: var(--shadow); max-width: 700px; margin: 0 auto;
+    }
+    .quiz-q { font-weight: 700; margin-bottom: 1rem; font-size: 1.05rem; }
+    .quiz-options { display: flex; flex-direction: column; gap: .6rem; margin-bottom: 1.2rem; }
+    .quiz-option {
+      display: flex; align-items: center; gap: .7rem;
+      padding: .75rem 1rem;
+      border: 2px solid #DDD; border-radius: 8px;
+      cursor: pointer; font-size: .9rem;
+      transition: background .15s, border-color .15s;
+    }
+    .quiz-option:hover { background: #F0EBF8; border-color: var(--purple); }
+    .quiz-option.correct { background: #D1F0E0; border-color: var(--green); }
+    .quiz-option.incorrect { background: var(--red-lt); border-color: var(--red); }
+    .quiz-feedback {
+      font-size: .9rem; font-weight: 600; padding: .6rem 1rem;
+      border-radius: 8px; margin-top: .5rem; display: none;
+    }
+    .quiz-feedback.show { display: block; }
+    .quiz-feedback.good { background: #D1F0E0; color: #276246; }
+    .quiz-feedback.bad  { background: var(--red-lt); color: var(--red); }
+    .quiz-nav { display: flex; gap: 1rem; margin-top: 1.2rem; flex-wrap: wrap; }
+    #quiz-progress { font-size: .85rem; color: var(--muted); margin-bottom: .5rem; }
+
+    /* ── Sign Up Form ── */
+    .signup-bg { background: var(--purple); }
+    .signup-bg .section-title { color: var(--gold-lt); }
+    .signup-bg .section-sub { color: rgba(255,255,255,.75); }
+    .signup-form {
+      background: rgba(255,255,255,.1); backdrop-filter: blur(6px);
+      border: 1px solid rgba(255,255,255,.2);
+      border-radius: var(--radius); padding: 2rem;
+      max-width: 560px; margin: 0 auto;
+    }
+    .form-row { display: flex; gap: 1rem; flex-wrap: wrap; }
+    .form-group { flex: 1; min-width: 200px; margin-bottom: 1rem; }
+    .form-group label { display: block; color: rgba(255,255,255,.85); font-size: .85rem; font-weight: 600; margin-bottom: .35rem; }
+    .form-group input, .form-group select {
+      width: 100%; padding: .65rem 1rem;
+      border: 2px solid rgba(255,255,255,.3); border-radius: 8px;
+      background: rgba(255,255,255,.12); color: var(--white);
+      font-size: .9rem; outline: none;
+      transition: border-color .2s;
+    }
+    .form-group input::placeholder { color: rgba(255,255,255,.5); }
+    .form-group input:focus, .form-group select:focus { border-color: var(--gold-lt); }
+    .form-group select option { color: var(--text); background: var(--white); }
+    .form-submit { text-align: center; margin-top: .5rem; }
+    #signup-msg { color: var(--gold-lt); font-size: .9rem; margin-top: .8rem; display: none; font-weight: 600; }
+
+    /* ── Footer ── */
+    footer {
+      background: #1A1A2E; color: rgba(255,255,255,.6);
+      padding: 2rem 1rem; text-align: center; font-size: .85rem;
+    }
+    footer strong { color: var(--gold-lt); }
+
+    /* ── Responsive ── */
+    @media (max-width: 768px) {
+      .nav-links { display: none; }
+      .hero { padding: 3rem 1.2rem 2.5rem; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <div class="nav-brand">🌱 NutriGators <span>| SFSU Nutrition Program</span></div>
+  <div class="nav-links">
+    <a href="#about">About</a>
+    <a href="#modules">Modules</a>
+    <a href="#workshops">Workshops</a>
+    <a href="#tips">Tips</a>
+    <a href="#resources">Resources</a>
+    <a href="#quiz">Quiz</a>
+    <a href="#signup">Sign Up</a>
+  </div>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-badge">SFSU Student Wellness Program</div>
+  <h1>Nutrition Education &amp; Its Effect on<br>Processed Food Intake</h1>
+  <p>A one-semester evidence-based program designed for SFSU undergraduates — learn how to eat smarter, spend less, and feel better on a student budget.</p>
+  <div class="hero-cta">
+    <a href="#signup" class="btn btn-gold">Join the Program</a>
+    <a href="#modules" class="btn btn-outline">Explore Curriculum</a>
+  </div>
+</section>
+
+<!-- STATS -->
+<div class="stats-bar">
+  <div class="stats-grid">
+    <div class="stat-item">
+      <div class="stat-number">67%</div>
+      <div class="stat-label">of college students consume<br>processed food daily</div>
+    </div>
+    <div class="stat-item">
+      <div class="stat-number">1 in 3</div>
+      <div class="stat-label">SFSU students report food<br>insecurity each semester</div>
+    </div>
+    <div class="stat-item">
+      <div class="stat-number">8</div>
+      <div class="stat-label">interactive workshops<br>over one semester</div>
+    </div>
+    <div class="stat-item">
+      <div class="stat-number">Free</div>
+      <div class="stat-label">no cost to enrolled<br>SFSU students</div>
+    </div>
+  </div>
+</div>
+
+<!-- ABOUT -->
+<section class="section" id="about">
+  <div class="container">
+    <h2 class="section-title">Why Does This Matter?</h2>
+    <div class="divider"></div>
+    <p class="section-sub">College students face unique barriers to healthy eating. Understanding the problem is the first step toward change.</p>
+    <div class="problem-grid">
+      <div class="problem-card">
+        <div class="icon">🍟</div>
+        <h3>Ultra-Processed Food Overload</h3>
+        <p>Convenience foods high in sodium, sugar, and refined carbohydrates dominate the college diet, contributing to weight gain, fatigue, and poor academic focus.</p>
+      </div>
+      <div class="problem-card">
+        <div class="icon">💸</div>
+        <h3>Budget Constraints</h3>
+        <p>Students often rely on cheap, calorie-dense processed options because healthy food is perceived — and sometimes genuinely is — more expensive and time-consuming.</p>
+      </div>
+      <div class="problem-card">
+        <div class="icon">📚</div>
+        <h3>Nutrition Knowledge Gap</h3>
+        <p>Most undergraduate students receive little to no formal nutrition education in their degree programs, leaving them without tools to make informed food decisions.</p>
+      </div>
+      <div class="problem-card">
+        <div class="icon">🏙️</div>
+        <h3>Environmental Barriers</h3>
+        <p>Campus and neighborhood food environments often make processed foods the path of least resistance, reinforcing poor dietary habits throughout the academic year.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- MODULES -->
+<section class="section overview-bg" id="modules">
+  <div class="container">
+    <h2 class="section-title">Program Curriculum</h2>
+    <div class="divider"></div>
+    <p class="section-sub">Eight evidence-based modules delivered across one semester, blending online content with hands-on in-person workshops.</p>
+    <div class="modules-grid">
+      <div class="module-card">
+        <div class="module-week">Weeks 1–2</div>
+        <h3>📖 What Is Processed Food?</h3>
+        <p>Understanding the NOVA classification system, reading nutrition labels, and identifying ultra-processed foods in everyday diets.</p>
+        <ul>
+          <li>NOVA food classification</li>
+          <li>Label reading activity</li>
+          <li>Personal food log baseline</li>
+        </ul>
+      </div>
+      <div class="module-card">
+        <div class="module-week">Weeks 3–4</div>
+        <h3>🧠 Food &amp; Brain Performance</h3>
+        <p>How dietary patterns affect cognitive function, memory, concentration, and academic performance in college students.</p>
+        <ul>
+          <li>Gut-brain connection</li>
+          <li>Energy fluctuations &amp; sugar crashes</li>
+          <li>Study snack planning</li>
+        </ul>
+      </div>
+      <div class="module-card">
+        <div class="module-week">Weeks 5–6</div>
+        <h3>🛒 Smart Grocery Shopping</h3>
+        <p>How to build a weekly meal plan, navigate grocery stores strategically, and maximize nutrition on a limited student budget.</p>
+        <ul>
+          <li>Budget meal planning</li>
+          <li>Seasonal produce guide</li>
+          <li>Clement St. Farmers Market tour</li>
+        </ul>
+      </div>
+      <div class="module-card">
+        <div class="module-week">Weeks 7–8</div>
+        <h3>🍳 Cooking Skills Basics</h3>
+        <p>Hands-on cooking demonstrations showing how simple whole food meals can be prepared in 20 minutes or less with minimal equipment.</p>
+        <ul>
+          <li>Batch cooking techniques</li>
+          <li>5-ingredient whole food recipes</li>
+          <li>Dorm-friendly meal prep</li>
+        </ul>
+      </div>
+      <div class="module-card">
+        <div class="module-week">Weeks 9–10</div>
+        <h3>🌍 Food Systems &amp; PSE</h3>
+        <p>How policies, systems, and environments shape what we eat — and how students can advocate for healthier campus food environments.</p>
+        <ul>
+          <li>Food desert mapping activity</li>
+          <li>SFSU campus food audit</li>
+          <li>Advocacy letter writing</li>
+        </ul>
+      </div>
+      <div class="module-card">
+        <div class="module-week">Weeks 11–12</div>
+        <h3>🧘 Mindful Eating</h3>
+        <p>Developing a healthy relationship with food, recognizing emotional eating patterns, and building sustainable dietary habits without restriction.</p>
+        <ul>
+          <li>Hunger vs. craving awareness</li>
+          <li>Stress eating strategies</li>
+          <li>Non-diet approach principles</li>
+        </ul>
+      </div>
+      <div class="module-card">
+        <div class="module-week">Weeks 13–14</div>
+        <h3>🏷️ Navigating Food Marketing</h3>
+        <p>Recognizing deceptive health claims, understanding front-of-package marketing, and becoming a critical consumer of nutrition information.</p>
+        <ul>
+          <li>Deconstructing health halos</li>
+          <li>"Natural" vs. nutritious</li>
+          <li>Social media &amp; diet culture</li>
+        </ul>
+      </div>
+      <div class="module-card">
+        <div class="module-week">Weeks 15–16</div>
+        <h3>🎯 Goal Setting &amp; Reflection</h3>
+        <p>Students review their personal food logs, set SMART nutrition goals for the next semester, and share program outcomes with peers.</p>
+        <ul>
+          <li>Pre/post dietary assessment</li>
+          <li>SMART goal framework</li>
+          <li>Peer accountability pairs</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FOOD COMPARISON -->
+<section class="section" id="foodcomp">
+  <div class="container">
+    <h2 class="section-title">Processed vs. Whole Foods</h2>
+    <div class="divider"></div>
+    <p class="section-sub">Understanding the difference is the foundation of this program. Here's a quick comparison to get you started.</p>
+    <div class="compare-grid">
+      <div class="compare-card processed">
+        <h3>🚫 Ultra-Processed Foods</h3>
+        <ul>
+          <li>Packaged chips, cookies, crackers</li>
+          <li>Instant ramen &amp; cup noodles</li>
+          <li>Energy drinks &amp; sodas</li>
+          <li>Fast food &amp; frozen meals</li>
+          <li>Flavored yogurts &amp; cereals</li>
+          <li>Deli meats &amp; hot dogs</li>
+        </ul>
+        <p style="margin-top:.8rem;font-size:.85rem;color:#C0392B;font-weight:600;">High in sodium, added sugar, saturated fat, and artificial additives. Linked to inflammation, fatigue, and chronic disease risk.</p>
+      </div>
+      <div class="compare-card whole">
+        <h3>✅ Whole &amp; Minimally Processed Foods</h3>
+        <ul>
+          <li>Fresh fruits &amp; vegetables</li>
+          <li>Brown rice, oats, quinoa</li>
+          <li>Beans, lentils, chickpeas</li>
+          <li>Eggs, plain Greek yogurt</li>
+          <li>Nuts, seeds, nut butters</li>
+          <li>Canned tomatoes, frozen veggies</li>
+        </ul>
+        <p style="margin-top:.8rem;font-size:.85rem;color:#276246;font-weight:600;">Rich in fiber, vitamins, minerals, and antioxidants. Support energy, focus, immune function, and long-term health.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- WORKSHOP SCHEDULE -->
+<section class="section overview-bg" id="workshops">
+  <div class="container">
+    <h2 class="section-title">Workshop Schedule</h2>
+    <div class="divider"></div>
+    <p class="section-sub">All workshops are free, open to SFSU students, and held on campus. Snacks provided!</p>
+    <div style="overflow-x:auto;">
+      <table class="schedule-table">
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>Workshop Title</th>
+            <th>Date</th>
+            <th>Time</th>
+            <th>Location</th>
+            <th>Format</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><td>1</td><td>Kickoff: Know Your Food</td><td>Feb 3, 2026</td><td>5:00–6:30 PM</td><td>Cesar Chavez Student Center, Rm 220</td><td><span class="badge badge-green">In-Person</span></td></tr>
+          <tr><td>2</td><td>Label Reading 101</td><td>Feb 17, 2026</td><td>5:00–6:30 PM</td><td>Zoom (link via email)</td><td><span class="badge badge-purple">Online</span></td></tr>
+          <tr><td>3</td><td>Farmers Market Field Trip</td><td>Mar 3, 2026</td><td>9:00–11:00 AM</td><td>Clement St. Farmers Market</td><td><span class="badge badge-gold">Field Trip</span></td></tr>
+          <tr><td>4</td><td>Budget Meal Planning</td><td>Mar 17, 2026</td><td>5:00–6:30 PM</td><td>Cesar Chavez Student Center, Rm 220</td><td><span class="badge badge-green">In-Person</span></td></tr>
+          <tr><td>5</td><td>Cooking Demo: Quick Whole Meals</td><td>Apr 7, 2026</td><td>5:00–7:00 PM</td><td>Family &amp; Consumer Sciences Building, Kitchen Lab</td><td><span class="badge badge-green">In-Person</span></td></tr>
+          <tr><td>6</td><td>Food Marketing &amp; Diet Culture</td><td>Apr 21, 2026</td><td>5:00–6:30 PM</td><td>Zoom (link via email)</td><td><span class="badge badge-purple">Online</span></td></tr>
+          <tr><td>7</td><td>Mindful Eating Workshop</td><td>May 5, 2026</td><td>5:00–6:30 PM</td><td>Cesar Chavez Student Center, Rm 220</td><td><span class="badge badge-green">In-Person</span></td></tr>
+          <tr><td>8</td><td>Reflection &amp; Goal Setting Showcase</td><td>May 19, 2026</td><td>5:00–7:00 PM</td><td>Cesar Chavez Student Center, Rm 220</td><td><span class="badge badge-gold">Celebration</span></td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+<!-- TIPS -->
+<section class="section" id="tips">
+  <div class="container">
+    <h2 class="section-title">Quick Tips for Students</h2>
+    <div class="divider"></div>
+    <p class="section-sub">Small, practical changes that make a real difference — no perfection required.</p>
+    <div class="tips-grid">
+      <div class="tip-card"><div class="tip-icon">🫙</div><h4>Batch Cook on Sundays</h4><p>Prep a big pot of rice, beans, or lentils once a week. It costs under $5 and feeds you for days.</p></div>
+      <div class="tip-card"><div class="tip-icon">🧃</div><h4>Swap Sugary Drinks</h4><p>Replace sodas and energy drinks with water, sparkling water, or unsweetened tea. Save money and reduce sugar intake instantly.</p></div>
+      <div class="tip-card"><div class="tip-icon">🍎</div><h4>Keep Fruit Visible</h4><p>Place apples, bananas, or oranges on your desk or bag. You're more likely to eat what you can see.</p></div>
+      <div class="tip-card"><div class="tip-icon">🥫</div><h4>Stock Canned Goods</h4><p>Canned beans, tomatoes, and tuna are cheap, nutritious, and shelf-stable — perfect for busy student life.</p></div>
+      <div class="tip-card"><div class="tip-icon">🛒</div><h4>Shop the Perimeter</h4><p>Whole foods — produce, dairy, meat — line the outer edges of most grocery stores. The interior aisles are where most ultra-processed foods live.</p></div>
+      <div class="tip-card"><div class="tip-icon">📱</div><h4>Use CalFresh (SNAP)</h4><p>If you're income-eligible, CalFresh can provide $200+ per month for groceries. Apply at GetCalFresh.org — many SFSU students qualify.</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- RESOURCES -->
+<section class="section resources-bg" id="resources">
+  <div class="container">
+    <h2 class="section-title">Campus &amp; Community Resources</h2>
+    <div class="divider"></div>
+    <p class="section-sub">You don't have to navigate this alone. Here are free resources available to SFSU students right now.</p>
+    <div class="resources-grid">
+      <div class="resource-card"><div class="resource-icon">🏫</div><div><h4>SFSU Student Health &amp; Counseling</h4><p>Offers nutrition counseling appointments with a registered dietitian for enrolled students.</p><a href="https://health.sfsu.edu" target="_blank">health.sfsu.edu →</a></div></div>
+      <div class="resource-card"><div class="resource-icon">🥦</div><div><h4>SFSU Food Pantry</h4><p>Free groceries including fresh produce for SFSU students experiencing food insecurity. No income verification required.</p><a href="https://dos.sfsu.edu/content/food-pantry" target="_blank">dos.sfsu.edu →</a></div></div>
+      <div class="resource-card"><div class="resource-icon">💳</div><div><h4>CalFresh / SNAP Benefits</h4><p>Eligible students can receive monthly grocery funds. Apply online in minutes through GetCalFresh.</p><a href="https://www.getcalfresh.org" target="_blank">getcalfresh.org →</a></div></div>
+      <div class="resource-card"><div class="resource-icon">🌿</div><div><h4>Clement St. Farmers Market</h4><p>Open every Sunday 9am–2pm, just minutes from campus. Fresh, local, seasonal produce. EBT/CalFresh accepted.</p><a href="https://www.agriculturalinstitute.org/clement-st" target="_blank">agriculturalinstitute.org →</a></div></div>
+      <div class="resource-card"><div class="resource-icon">🍽️</div><div><h4>SNAP-Ed Resources</h4><p>Free evidence-based nutrition education resources, recipes, and tools for individuals on a limited budget.</p><a href="https://snaped.fns.usda.gov" target="_blank">snaped.fns.usda.gov →</a></div></div>
+      <div class="resource-card"><div class="resource-icon">🏥</div><div><h4>Richmond Neighborhood Center</h4><p>Provides free weekly produce and groceries to over 700 Richmond District residents through food pantry partnerships.</p><a href="https://richmondsf.org/food-security" target="_blank">richmondsf.org →</a></div></div>
+    </div>
+  </div>
+</section>
+
+<!-- QUIZ -->
+<section class="section" id="quiz">
+  <div class="container">
+    <h2 class="section-title">Test Your Knowledge</h2>
+    <div class="divider"></div>
+    <p class="section-sub">A quick 5-question quiz to see what you already know about processed food and nutrition.</p>
+    <div class="quiz-box">
+      <div id="quiz-progress">Question 1 of 5</div>
+      <div id="quiz-container"></div>
+      <div class="quiz-nav">
+        <button class="btn btn-gold" onclick="nextQuestion()" id="quiz-next" style="display:none;">Next Question →</button>
+        <button class="btn" style="background:var(--green);color:white;display:none;" onclick="resetQuiz()" id="quiz-restart">Restart Quiz</button>
+      </div>
+      <div id="quiz-score" style="display:none;margin-top:1rem;font-size:1.1rem;font-weight:700;color:var(--purple);"></div>
+    </div>
+  </div>
+</section>
+
+<!-- SIGN UP -->
+<section class="section signup-bg" id="signup">
+  <div class="container">
+    <h2 class="section-title">Join NutriGators</h2>
+    <div class="divider"></div>
+    <p class="section-sub">Sign up to enroll in the semester-long program, receive workshop reminders, and access exclusive resources.</p>
+    <div class="signup-form">
+      <div class="form-row">
+        <div class="form-group"><label for="fname">First Name</label><input type="text" id="fname" placeholder="e.g. Maria" /></div>
+        <div class="form-group"><label for="lname">Last Name</label><input type="text" id="lname" placeholder="e.g. Torres" /></div>
+      </div>
+      <div class="form-group"><label for="email">SFSU Email Address</label><input type="email" id="email" placeholder="yourname@sfsu.edu" /></div>
+      <div class="form-row">
+        <div class="form-group"><label for="major">Major / Department</label><input type="text" id="major" placeholder="e.g. Kinesiology" /></div>
+        <div class="form-group">
+          <label for="year">Year</label>
+          <select id="year">
+            <option value="">Select year...</option>
+            <option>Freshman</option><option>Sophomore</option>
+            <option>Junior</option><option>Senior</option>
+            <option>Graduate Student</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-group">
+        <label for="goal">What is your main goal for this program?</label>
+        <select id="goal">
+          <option value="">Select a goal...</option>
+          <option>Reduce processed food intake</option>
+          <option>Learn to cook healthy meals</option>
+          <option>Eat healthy on a budget</option>
+          <option>Improve energy &amp; focus</option>
+          <option>Learn more about nutrition generally</option>
+        </select>
+      </div>
+      <div class="form-submit">
+        <button class="btn btn-gold" style="font-size:1rem;padding:.85rem 2.5rem;" onclick="handleSignup()">🌱 Enroll Now — It's Free!</button>
+        <div id="signup-msg"></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <p><strong>NutriGators</strong> — A Student Wellness Initiative at <strong>San Francisco State University</strong></p>
+  <p style="margin-top:.4rem;">Department of Family &amp; Consumer Sciences &nbsp;|&nbsp; Student Health Services &nbsp;|&nbsp; Associated Students Inc.</p>
+  <p style="margin-top:.4rem;font-size:.78rem;">This program is for educational purposes. Content informed by USDA Dietary Guidelines, SNAP-Ed, and <em>Community Nutrition in Action</em> (Boyle &amp; Roth, 8th ed.).</p>
+</footer>
+
+<script>
+  const questions = [
+    { q: "Which of the following is an example of an ultra-processed food according to the NOVA classification?", options: ["Frozen broccoli","Canned chickpeas","Instant ramen noodles","Rolled oats"], correct: 2, explanation: "Correct! Instant ramen is ultra-processed — it contains artificial flavors, preservatives, and has been industrially formulated. Frozen vegetables and canned legumes are minimally processed and still nutritious." },
+    { q: "According to research, what is one key benefit of replacing ultra-processed foods with whole foods for college students?", options: ["Improved cognitive function and concentration","Higher calorie intake","Faster food preparation time","Lower grocery costs in all cases"], correct: 0, explanation: "Correct! Whole foods rich in fiber, vitamins, and healthy fats support stable blood sugar and better brain function — directly impacting academic performance." },
+    { q: "What does the acronym PSE stand for in public health nutrition?", options: ["Protein, Starch, and Energy","Policy, Systems, and Environment","Prevention, Support, and Education","Plant-based, Sustainable, and Ethical"], correct: 1, explanation: "Correct! PSE — Policy, Systems, and Environment — is a framework that addresses the structural factors shaping what people eat, beyond individual behavior." },
+    { q: "Which of the following strategies is MOST effective for long-term obesity prevention, according to public health evidence?", options: ["Individual willpower and self-control alone","Cutting all carbohydrates from the diet","Combining individual nutrition education with PSE-level changes","Counting calories at every meal"], correct: 2, explanation: "Correct! Research consistently shows that individual education plus structural/environmental changes together produce the most sustainable outcomes." },
+    { q: "Which resource can help SFSU students who are income-eligible receive monthly funds for groceries?", options: ["SFSU Housing Portal","CalFresh (SNAP)","ASI Recreation Center","Campus Bookstore rewards"], correct: 1, explanation: "Correct! CalFresh is California's SNAP program. Many SFSU students qualify and can receive $200+ per month for groceries by applying at GetCalFresh.org." }
+  ];
+  let current = 0, score = 0, answered = false;
+  function renderQuestion() {
+    answered = false;
+    const q = questions[current];
+    document.getElementById('quiz-progress').textContent = `Question ${current + 1} of ${questions.length}`;
+    document.getElementById('quiz-next').style.display = 'none';
+    document.getElementById('quiz-restart').style.display = 'none';
+    document.getElementById('quiz-score').style.display = 'none';
+    let html = `<div class="quiz-q">${q.q}</div><div class="quiz-options">`;
+    q.options.forEach((opt, i) => { html += `<div class="quiz-option" onclick="selectAnswer(${i})" id="opt-${i}"><span style="font-weight:700;color:var(--purple);">${String.fromCharCode(65+i)}.</span> ${opt}</div>`; });
+    html += `</div><div class="quiz-feedback" id="quiz-feedback"></div>`;
+    document.getElementById('quiz-container').innerHTML = html;
+  }
+  function selectAnswer(idx) {
+    if (answered) return;
+    answered = true;
+    const q = questions[current];
+    const fb = document.getElementById('quiz-feedback');
+    document.querySelectorAll('.quiz-option').forEach((el, i) => { el.style.pointerEvents = 'none'; if (i === q.correct) el.classList.add('correct'); });
+    if (idx === q.correct) { score++; fb.textContent = '✅ ' + q.explanation; fb.className = 'quiz-feedback show good'; document.getElementById(`opt-${idx}`).classList.add('correct'); }
+    else { fb.textContent = '❌ ' + q.explanation; fb.className = 'quiz-feedback show bad'; document.getElementById(`opt-${idx}`).classList.add('incorrect'); }
+    if (current < questions.length - 1) { document.getElementById('quiz-next').style.display = 'inline-block'; }
+    else { const scoreEl = document.getElementById('quiz-score'); scoreEl.style.display = 'block'; const pct = Math.round((score/questions.length)*100); let msg = pct===100?'🏆 Perfect score!':pct>=60?'👏 Great job!':'📚 Keep learning — you\'ve got this!'; scoreEl.textContent = `${msg} You scored ${score} out of ${questions.length} (${pct}%)`; document.getElementById('quiz-restart').style.display = 'inline-block'; }
+  }
+  function nextQuestion() { current++; renderQuestion(); }
+  function resetQuiz() { current = 0; score = 0; renderQuestion(); }
+  renderQuestion();
+  function handleSignup() {
+    const fname = document.getElementById('fname').value.trim();
+    const email = document.getElementById('email').value.trim();
+    const year  = document.getElementById('year').value;
+    const msg   = document.getElementById('signup-msg');
+    if (!fname || !email || !year) { msg.textContent = '⚠️ Please fill in your name, SFSU email, and year to enroll.'; msg.style.color = '#FFD580'; msg.style.display = 'block'; return; }
+    if (!email.endsWith('@sfsu.edu') && !email.endsWith('@mail.sfsu.edu')) { msg.textContent = '⚠️ Please use your SFSU email address (@sfsu.edu).'; msg.style.color = '#FFD580'; msg.style.display = 'block'; return; }
+    msg.textContent = `🎉 Welcome, ${fname}! You're enrolled in NutriGators. Check your email for next steps.`; msg.style.color = '#B8F5D0'; msg.style.display = 'block';
+  }
+</script>
+</body>
+</html>
