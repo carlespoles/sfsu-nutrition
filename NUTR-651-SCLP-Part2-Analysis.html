@@ -1,0 +1,691 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>NutriGators · Part 2 Analysis</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<style>
+  :root {
+    --green-dark:  #215b34;
+    --green-mid:   #3a7d52;
+    --green-light: #e8f4ec;
+    --amber:       #e8a020;
+    --text-dark:   #1a2e1e;
+    --text-mid:    #4a5e50;
+    --text-light:  #7a9080;
+    --white:       #ffffff;
+    --off-white:   #f9faf7;
+    --red:         #8b1a1a;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Segoe UI', system-ui, sans-serif;
+    background: var(--off-white);
+    color: var(--text-dark);
+    line-height: 1.6;
+  }
+
+  /* ── Header ── */
+  header {
+    background: var(--green-dark);
+    color: white;
+    padding: 0;
+  }
+  .header-top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 1rem 2rem;
+    border-bottom: 4px solid var(--amber);
+  }
+  .header-top h1 { font-size: 1.5rem; font-weight: 700; letter-spacing: -0.02em; }
+  .header-top .subtitle { font-size: 0.85rem; color: #a8c8b4; margin-top: 0.15rem; }
+  .header-nav { display: flex; gap: 0.5rem; }
+  .header-nav a {
+    background: rgba(255,255,255,0.1);
+    color: white;
+    text-decoration: none;
+    padding: 0.4rem 0.9rem;
+    border-radius: 4px;
+    font-size: 0.82rem;
+    transition: background 0.2s;
+  }
+  .header-nav a:hover { background: rgba(255,255,255,0.2); }
+
+  /* ── Hero band ── */
+  .hero {
+    background: var(--green-dark);
+    padding: 2rem;
+    text-align: center;
+    color: white;
+  }
+  .hero h2 { font-size: 2rem; font-weight: 800; }
+  .hero p { color: #a8c8b4; margin-top: 0.5rem; font-size: 0.95rem; }
+
+  /* ── Stat pills ── */
+  .stat-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+    justify-content: center;
+    padding: 2rem;
+    background: var(--green-dark);
+    border-top: 1px solid rgba(255,255,255,0.1);
+  }
+  .stat-pill {
+    background: rgba(255,255,255,0.08);
+    border: 1px solid rgba(255,255,255,0.15);
+    border-radius: 10px;
+    padding: 1rem 1.5rem;
+    text-align: center;
+    min-width: 130px;
+  }
+  .stat-pill .val { font-size: 2rem; font-weight: 800; color: white; }
+  .stat-pill .lbl { font-size: 0.75rem; color: #a8c8b4; margin-top: 0.25rem; }
+
+  /* ── Layout ── */
+  .container { max-width: 1100px; margin: 0 auto; padding: 2rem; }
+
+  section { margin-bottom: 3rem; }
+
+  .section-title {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: var(--green-dark);
+    border-left: 4px solid var(--amber);
+    padding-left: 0.75rem;
+    margin-bottom: 1.25rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+
+  /* ── Cards ── */
+  .card {
+    background: white;
+    border-radius: 10px;
+    padding: 1.5rem;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.07);
+    border: 1px solid #e0ebe3;
+  }
+
+  .card-grid {
+    display: grid;
+    gap: 1.25rem;
+  }
+  .card-grid-2 { grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); }
+  .card-grid-3 { grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); }
+
+  .card h3 {
+    font-size: 0.9rem;
+    font-weight: 700;
+    color: var(--text-mid);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-bottom: 1rem;
+  }
+
+  /* ── Key finding card ── */
+  .key-finding {
+    background: var(--green-dark);
+    color: white;
+    border-radius: 10px;
+    padding: 1.5rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    gap: 0.5rem;
+  }
+  .key-finding .kf-label { font-size: 0.8rem; color: #a8c8b4; text-transform: uppercase; letter-spacing: 0.08em; }
+  .key-finding .kf-value { font-size: 2.4rem; font-weight: 800; color: white; }
+  .key-finding .kf-sub   { font-size: 0.82rem; color: var(--amber); font-weight: 600; }
+
+  /* ── Delta badge ── */
+  .delta-pos { color: #1a6b35; background: #d4f0dc; padding: 0.1rem 0.5rem; border-radius: 4px; font-weight: 700; font-size: 0.85rem; }
+  .delta-neg { color: var(--red); background: #fbe8e8; padding: 0.1rem 0.5rem; border-radius: 4px; font-weight: 700; font-size: 0.85rem; }
+  .delta-neu { color: var(--text-mid); background: #eef0ee; padding: 0.1rem 0.5rem; border-radius: 4px; font-weight: 700; font-size: 0.85rem; }
+
+  /* ── Comparison rows ── */
+  .compare-row {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.65rem 0;
+    border-bottom: 1px solid #eef2ee;
+    font-size: 0.88rem;
+  }
+  .compare-row:last-child { border-bottom: none; }
+  .compare-label { flex: 1; color: var(--text-mid); }
+  .compare-bars { flex: 2; display: flex; gap: 0.4rem; align-items: center; }
+  .bar-wrap { flex: 1; }
+  .bar-track { background: #eef0ee; border-radius: 4px; height: 10px; overflow: hidden; }
+  .bar-fill-pre  { background: #a8c8b4; height: 10px; border-radius: 4px; transition: width 0.8s ease; }
+  .bar-fill-post { background: var(--green-dark); height: 10px; border-radius: 4px; transition: width 0.8s ease; }
+  .bar-val { font-size: 0.78rem; font-weight: 700; color: var(--text-dark); width: 28px; text-align: right; }
+
+  /* ── Chart container ── */
+  .chart-box { position: relative; height: 260px; }
+  .chart-box-tall { position: relative; height: 320px; }
+
+  /* ── Legend pill ── */
+  .legend { display: flex; gap: 1.2rem; font-size: 0.8rem; color: var(--text-mid); margin-bottom: 0.75rem; flex-wrap: wrap; }
+  .legend span { display: flex; align-items: center; gap: 0.4rem; }
+  .dot { width: 10px; height: 10px; border-radius: 50%; display: inline-block; }
+
+  /* ── Swap list ── */
+  .swap-list { list-style: none; }
+  .swap-list li {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.6rem;
+    padding: 0.5rem 0;
+    border-bottom: 1px solid #eef2ee;
+    font-size: 0.88rem;
+    color: var(--text-mid);
+  }
+  .swap-list li:last-child { border-bottom: none; }
+  .swap-arrow { color: var(--amber); font-weight: 700; flex-shrink: 0; }
+
+  /* ── Limitation box ── */
+  .limitation {
+    background: #fff8f8;
+    border: 1px solid #f0c0c0;
+    border-left: 4px solid var(--red);
+    border-radius: 8px;
+    padding: 1rem 1.25rem;
+    margin-bottom: 0.75rem;
+    font-size: 0.88rem;
+  }
+  .limitation strong { color: var(--red); display: block; margin-bottom: 0.25rem; }
+
+  /* ── Methodology timeline ── */
+  .timeline { position: relative; padding-left: 2rem; }
+  .timeline::before { content: ''; position: absolute; left: 0.5rem; top: 0; bottom: 0; width: 2px; background: var(--green-light); }
+  .tl-item { position: relative; padding: 0 0 1.25rem 1rem; }
+  .tl-item::before { content: ''; position: absolute; left: -1.62rem; top: 4px; width: 14px; height: 14px; border-radius: 50%; background: var(--green-dark); border: 2px solid white; box-shadow: 0 0 0 2px var(--green-dark); }
+  .tl-item h4 { font-size: 0.88rem; font-weight: 700; color: var(--green-dark); }
+  .tl-item p  { font-size: 0.82rem; color: var(--text-mid); margin-top: 0.2rem; }
+
+  /* ── Footer ── */
+  footer {
+    background: var(--green-dark);
+    color: #a8c8b4;
+    text-align: center;
+    padding: 1.5rem;
+    font-size: 0.8rem;
+    margin-top: 3rem;
+  }
+  footer a { color: var(--amber); }
+
+  /* ── Responsive ── */
+  @media (max-width: 600px) {
+    .header-top { flex-direction: column; gap: 0.75rem; }
+    .hero h2 { font-size: 1.4rem; }
+    .stat-pill .val { font-size: 1.5rem; }
+    .compare-bars { flex-direction: column; gap: 0.25rem; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ── HEADER ── -->
+<header>
+  <div class="header-top">
+    <div>
+      <div class="subtitle">NUTR 651 · SFSU · Spring 2026</div>
+      <h1>NutriGators · Part 2 Analysis</h1>
+    </div>
+    <nav class="header-nav">
+      <a href="NUTR-651-SCLP.html">← Main Site</a>
+      <a href="NUTR651_Statistical_Analysis.html">Part 1 Analysis</a>
+    </nav>
+  </div>
+  <div class="hero">
+    <h2>Intervention Results</h2>
+    <p>Pre & Post-Survey Analysis · Real Food, Real Health Workshop · May 2026</p>
+  </div>
+  <div class="stat-row">
+    <div class="stat-pill"><div class="val">25</div><div class="lbl">Pre-survey<br>respondents</div></div>
+    <div class="stat-pill"><div class="val">6</div><div class="lbl">Post-survey<br>completions</div></div>
+    <div class="stat-pill"><div class="val">+56%</div><div class="lbl">Self-rated<br>knowledge gain</div></div>
+    <div class="stat-pill"><div class="val">4.2/5</div><div class="lbl">Workshop<br>rating</div></div>
+    <div class="stat-pill"><div class="val">100%</div><div class="lbl">Would<br>recommend</div></div>
+    <div class="stat-pill"><div class="val">14</div><div class="lbl">Intervention<br>slides</div></div>
+    <div class="stat-pill"><div class="val">9</div><div class="lbl">Nutrition<br>handouts</div></div>
+    <div class="stat-pill"><div class="val">7</div><div class="lbl">Educational<br>videos</div></div>
+  </div>
+</header>
+
+<div class="container">
+
+  <!-- ── INTERVENTION OVERVIEW ── -->
+  <section>
+    <div class="section-title">Intervention Overview</div>
+    <div class="card">
+      <div class="timeline">
+        <div class="tl-item">
+          <h4>Phase 1 — Pre-Survey (n = 25)</h4>
+          <p>10-item UPF knowledge quiz · dietary habits · self-efficacy & confidence baseline · demographics</p>
+        </div>
+        <div class="tl-item">
+          <h4>Phase 2 — Intervention Materials</h4>
+          <p>NutriGators website · 7 videos (5 animated + cooking demo + food pantry guide) · 9 handouts · 14-slide presentation deck</p>
+        </div>
+        <div class="tl-item">
+          <h4>Phase 3 — Post-Survey (n = 6)</h4>
+          <p>Repeat knowledge quiz & habits · workshop evaluation · behavior change intentions · planned food swaps</p>
+        </div>
+        <div class="tl-item">
+          <h4>Recruitment</h4>
+          <p>Campus flyers · r/SFSU Reddit post · $20 Starbucks gift card incentive · Pickup at Cesar Chavez Student Center</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── KEY FINDINGS ── -->
+  <section>
+    <div class="section-title">Key Findings</div>
+    <div class="card-grid card-grid-3">
+      <div class="key-finding">
+        <div class="kf-label">Self-Rated Knowledge</div>
+        <div class="kf-value">2.7 → 4.2</div>
+        <div class="kf-sub">+56% increase (out of 5)</div>
+        <div style="font-size:0.78rem;color:#a8c8b4;margin-top:0.3rem">Most significant finding</div>
+      </div>
+      <div class="key-finding">
+        <div class="kf-label">Cooking Confidence</div>
+        <div class="kf-value">+22%</div>
+        <div class="kf-sub">3.62 → 4.40 out of 5</div>
+        <div style="font-size:0.78rem;color:#a8c8b4;margin-top:0.3rem">Largest objective gain</div>
+      </div>
+      <div class="key-finding">
+        <div class="kf-label">Motivation to Improve</div>
+        <div class="kf-value">+11%</div>
+        <div class="kf-sub">3.60 → 4.00 out of 5</div>
+        <div style="font-size:0.78rem;color:#a8c8b4;margin-top:0.3rem">Post-intervention</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── DEMOGRAPHICS ── -->
+  <section>
+    <div class="section-title">Pre-Survey Demographics (n = 25)</div>
+    <div class="card-grid card-grid-2">
+      <div class="card">
+        <h3>Age Distribution</h3>
+        <div class="chart-box"><canvas id="chartAge"></canvas></div>
+      </div>
+      <div class="card">
+        <h3>Year of Study</h3>
+        <div class="chart-box"><canvas id="chartYear"></canvas></div>
+      </div>
+      <div class="card">
+        <h3>Monthly Food Budget</h3>
+        <div class="chart-box"><canvas id="chartBudget"></canvas></div>
+      </div>
+      <div class="card">
+        <h3>Weekly Work Hours</h3>
+        <div class="chart-box"><canvas id="chartWork"></canvas></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── UPF CONSUMPTION ── -->
+  <section>
+    <div class="section-title">UPF Consumption — Pre-Survey Baseline</div>
+    <div class="card-grid card-grid-2">
+      <div class="card">
+        <h3>UPF Consumption Frequency</h3>
+        <div class="chart-box-tall"><canvas id="chartC1"></canvas></div>
+      </div>
+      <div class="card">
+        <h3>% of Daily Meals that are Processed</h3>
+        <div class="chart-box-tall"><canvas id="chartC3"></canvas></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── KNOWLEDGE QUIZ ── -->
+  <section>
+    <div class="section-title">Knowledge Quiz — Pre vs. Post (10 items)</div>
+    <div class="card-grid card-grid-2">
+      <div class="card">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:0.75rem">
+          <h3 style="margin:0">Overall Score</h3>
+          <span class="delta-neu">−0.14 pts</span>
+        </div>
+        <div style="display:flex;gap:1.5rem;justify-content:center;padding:1rem 0">
+          <div style="text-align:center">
+            <div style="font-size:2.5rem;font-weight:800;color:var(--green-dark)">6.6<span style="font-size:1.2rem">/10</span></div>
+            <div style="font-size:0.78rem;color:var(--text-mid);margin-top:0.25rem">Pre-survey mean<br><small>(n = 25)</small></div>
+          </div>
+          <div style="font-size:2rem;color:var(--text-light);align-self:center">→</div>
+          <div style="text-align:center">
+            <div style="font-size:2.5rem;font-weight:800;color:var(--green-dark)">6.5<span style="font-size:1.2rem">/10</span></div>
+            <div style="font-size:0.78rem;color:var(--text-mid);margin-top:0.25rem">Post-survey mean<br><small>(n = 6)</small></div>
+          </div>
+        </div>
+        <p style="font-size:0.8rem;color:var(--text-light);text-align:center;font-style:italic">No significant change — baseline was already moderate (66.4%). Small post-survey n limits detectability.</p>
+      </div>
+      <div class="card">
+        <h3>Per-Question Accuracy (%)</h3>
+        <div class="chart-box-tall"><canvas id="chartKnowledge"></canvas></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── SELF-EFFICACY & CONFIDENCE ── -->
+  <section>
+    <div class="section-title">Self-Efficacy & Confidence — Pre vs. Post (1–5 scale)</div>
+    <div class="card-grid card-grid-2">
+      <div class="card">
+        <h3>Self-Efficacy (D1) — Beliefs</h3>
+        <div class="legend">
+          <span><span class="dot" style="background:#a8c8b4"></span> Pre-survey</span>
+          <span><span class="dot" style="background:var(--green-dark)"></span> Post-survey</span>
+        </div>
+        <div id="d1Rows"></div>
+      </div>
+      <div class="card">
+        <h3>Confidence (D2) — Skills</h3>
+        <div class="legend">
+          <span><span class="dot" style="background:#a8c8b4"></span> Pre-survey</span>
+          <span><span class="dot" style="background:var(--green-dark)"></span> Post-survey</span>
+        </div>
+        <div id="d2Rows"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── WORKSHOP EVALUATION ── -->
+  <section>
+    <div class="section-title">Workshop Evaluation (n = 6 post-survey)</div>
+    <div class="card-grid card-grid-2">
+      <div class="card">
+        <h3>Behavior Change Intentions (1–5)</h3>
+        <div class="chart-box-tall"><canvas id="chartIntentions"></canvas></div>
+      </div>
+      <div class="card">
+        <h3>Self-Rated Knowledge: Before vs. After Workshop</h3>
+        <div style="display:flex;gap:1.5rem;justify-content:center;padding:1.5rem 0">
+          <div style="text-align:center">
+            <div style="font-size:3rem;font-weight:800;color:#a8c8b4">2.7</div>
+            <div style="font-size:0.78rem;color:var(--text-mid)">Before workshop</div>
+          </div>
+          <div style="font-size:2.5rem;color:var(--amber);align-self:center;font-weight:700">+56%</div>
+          <div style="text-align:center">
+            <div style="font-size:3rem;font-weight:800;color:var(--green-dark)">4.2</div>
+            <div style="font-size:0.78rem;color:var(--text-mid)">After workshop</div>
+          </div>
+        </div>
+        <div style="background:var(--green-light);border-radius:8px;padding:1rem;margin-top:0.5rem">
+          <div style="display:flex;justify-content:space-between;font-size:0.85rem;margin-bottom:0.5rem">
+            <span style="font-weight:600;color:var(--green-dark)">Overall rating</span>
+            <span style="font-weight:700;color:var(--green-dark)">4.2 / 5 ⭐</span>
+          </div>
+          <div style="display:flex;justify-content:space-between;font-size:0.85rem">
+            <span style="font-weight:600;color:var(--green-dark)">Would recommend</span>
+            <span style="font-weight:700;color:var(--green-dark)">100% ✓</span>
+          </div>
+        </div>
+        <div style="margin-top:1rem">
+          <div style="font-size:0.82rem;font-weight:700;color:var(--text-mid);margin-bottom:0.5rem">Most useful element</div>
+          <div style="display:flex;gap:0.5rem;flex-wrap:wrap">
+            <span style="background:var(--green-dark);color:white;padding:0.25rem 0.6rem;border-radius:4px;font-size:0.78rem">Handout — UPF dangers (2)</span>
+            <span style="background:var(--green-dark);color:white;padding:0.25rem 0.6rem;border-radius:4px;font-size:0.78rem">Videos (2)</span>
+            <span style="background:#e0ebe3;color:var(--text-mid);padding:0.25rem 0.6rem;border-radius:4px;font-size:0.78rem">Recipe handout (1)</span>
+            <span style="background:#e0ebe3;color:var(--text-mid);padding:0.25rem 0.6rem;border-radius:4px;font-size:0.78rem">Label exercise (1)</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── PLANNED SWAPS ── -->
+  <section>
+    <div class="section-title">Planned Whole-Food Swaps</div>
+    <div class="card">
+      <p style="font-size:0.85rem;color:var(--text-mid);margin-bottom:1rem">When asked to name one specific whole-food swap they planned to make, all participants named a specific processed food to eliminate:</p>
+      <ul class="swap-list">
+        <li><span class="swap-arrow">▶</span> Takis / hot chips → whole-food snacks</li>
+        <li><span class="swap-arrow">▶</span> Chips → fruits</li>
+        <li><span class="swap-arrow">▶</span> Cheap instant ramen → less processed ramen alternatives</li>
+        <li><span class="swap-arrow">▶</span> Adding almond butter as a daily snack</li>
+        <li><span class="swap-arrow">▶</span> General chip elimination from diet</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- ── LIMITATIONS ── -->
+  <section>
+    <div class="section-title">Limitations</div>
+    <div class="limitation">
+      <strong>Recruitment resistance & 24% post-survey completion (6/25)</strong>
+      Part 1 needs assessment collected 52 responses in under one week. Part 2 faced active pushback during flyer distribution — the multi-step ask (pre-survey + materials + post-survey) during finals season dramatically raised the participation barrier.
+    </div>
+    <div class="limitation">
+      <strong>Small n limits statistical conclusions</strong>
+      n = 6 post-survey is too small for statistical significance. Results are directional only and cannot be generalized to the broader SFSU population.
+    </div>
+    <div class="limitation">
+      <strong>No knowledge quiz change detected</strong>
+      Pre-survey scores were already moderate (6.6/10). Ceiling effects and small n make quiz-based change hard to detect with this sample.
+    </div>
+    <div style="background:var(--green-light);border:1px solid var(--green-mid);border-radius:8px;padding:1rem 1.25rem;font-size:0.88rem;color:var(--text-mid)">
+      <strong style="color:var(--green-dark)">📚 Compared to literature:</strong> SCT-based programs in similar college settings show gains of 10–20% with n ≥ 30. Our directional gains in confidence (+0.37–0.41), motivation (+0.40), and self-rated knowledge (+56%) are consistent with the literature — but a larger sample and an earlier semester launch are needed to confirm behavioral change.
+    </div>
+  </section>
+
+  <!-- ── SUGGESTIONS ── -->
+  <section>
+    <div class="section-title">Suggestions for Future Iterations</div>
+    <div class="card">
+      <div class="card-grid card-grid-2" style="gap:0.75rem">
+        <div style="padding:0.75rem;background:var(--green-light);border-radius:8px;font-size:0.85rem">
+          <strong style="color:var(--green-dark)">📅 Launch in weeks 6–8</strong>
+          <p style="margin-top:0.25rem;color:var(--text-mid)">Avoid finals-season attrition. Earlier launch gives more follow-up time.</p>
+        </div>
+        <div style="padding:0.75rem;background:var(--green-light);border-radius:8px;font-size:0.85rem">
+          <strong style="color:var(--green-dark)">📢 Use Canvas announcements</strong>
+          <p style="margin-top:0.25rem;color:var(--text-mid)">Higher SFSU reach than physical flyers or Reddit posts.</p>
+        </div>
+        <div style="padding:0.75rem;background:var(--green-light);border-radius:8px;font-size:0.85rem">
+          <strong style="color:var(--green-dark)">🔔 Add automated reminders</strong>
+          <p style="margin-top:0.25rem;color:var(--text-mid)">Qualtrics follow-up emails to boost post-survey completion.</p>
+        </div>
+        <div style="padding:0.75rem;background:var(--green-light);border-radius:8px;font-size:0.85rem">
+          <strong style="color:var(--green-dark)">🎉 Add a social component</strong>
+          <p style="margin-top:0.25rem;color:var(--text-mid)">In-person cooking event with free food to drive participation.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+</div><!-- /container -->
+
+<footer>
+  <p>NutriGators · NUTR 651: Community Nutrition and Assessment · San Francisco State University · Spring 2026</p>
+  <p style="margin-top:0.5rem">Carles Poles-Mielgo · Marisa Leong · Barbara Narciso · Katrina Garcia · Ashley Fong · Kaitlyn Leung</p>
+  <p style="margin-top:0.5rem"><a href="NUTR-651-SCLP.html">← Back to main site</a></p>
+</footer>
+
+<script>
+// ── Chart defaults ──────────────────────────────────────────────
+Chart.defaults.font.family = "'Segoe UI', system-ui, sans-serif";
+Chart.defaults.font.size = 11;
+Chart.defaults.color = '#4a5e50';
+
+const GREEN = '#215b34';
+const GREEN_MID = '#3a7d52';
+const GREEN_LIGHT = '#a8c8b4';
+const AMBER = '#e8a020';
+const RED = '#8b1a1a';
+
+const GREENS = ['#215b34','#3a7d52','#5a9e72','#80c095','#a8d8b8'];
+
+function makeBar(id, labels, data, colors, horizontal=false) {
+  new Chart(document.getElementById(id), {
+    type: 'bar',
+    data: { labels, datasets: [{ data, backgroundColor: colors, borderRadius: 4, borderSkipped: false }] },
+    options: {
+      indexAxis: horizontal ? 'y' : 'x',
+      responsive: true, maintainAspectRatio: false,
+      plugins: { legend: { display: false } },
+      scales: {
+        x: { grid: { display: !horizontal }, ticks: { maxRotation: 30 } },
+        y: { grid: { display: horizontal }, beginAtZero: true }
+      }
+    }
+  });
+}
+
+function makePie(id, labels, data, colors) {
+  new Chart(document.getElementById(id), {
+    type: 'doughnut',
+    data: { labels, datasets: [{ data, backgroundColor: colors, borderWidth: 2, borderColor: '#fff' }] },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      plugins: { legend: { position: 'bottom', labels: { boxWidth: 12, padding: 10 } } }
+    }
+  });
+}
+
+// ── Demographics ────────────────────────────────────────────────
+makeBar('chartAge',
+  ['18–21', '22–25', '26–29', '30+'],
+  [10, 11, 3, 1],
+  [GREEN, GREEN_MID, GREEN_LIGHT, '#d0e8d8']
+);
+makeBar('chartYear',
+  ['Sophomore', 'Junior', 'Senior', 'Graduate', 'Super Senior'],
+  [8, 10, 3, 2, 2],
+  [GREEN, GREEN, GREEN_MID, GREEN_LIGHT, '#d0e8d8']
+);
+makePie('chartBudget',
+  ['<$100/mo', '$100–200/mo', '$200–350/mo', '>$350/mo'],
+  [1, 13, 7, 4],
+  [RED, GREEN, GREEN_MID, GREEN_LIGHT]
+);
+makeBar('chartWork',
+  ['0 hrs', '1–10 hrs', '11–20 hrs', '21–30 hrs', '30+ hrs'],
+  [8, 4, 7, 1, 5],
+  [GREEN, GREEN_MID, GREEN_MID, GREEN_LIGHT, AMBER]
+);
+
+// ── UPF consumption ─────────────────────────────────────────────
+makeBar('chartC1',
+  ['Daily', 'Often\n5–6x/wk', 'Sometimes\n3–4x/wk', 'Rarely\n1–2x/wk', 'Never'],
+  [2, 8, 9, 5, 1],
+  [RED, '#c0392b', AMBER, GREEN_MID, GREEN],
+  true
+);
+makePie('chartC3',
+  ['0–25%', '26–50%', '51–75%', '76–100%'],
+  [6, 8, 10, 1],
+  [GREEN, GREEN_MID, AMBER, RED]
+);
+
+// ── Knowledge quiz per-question ─────────────────────────────────
+new Chart(document.getElementById('chartKnowledge'), {
+  type: 'bar',
+  data: {
+    labels: ['B1\nUPF example','B2\nNOVA #','B3\nLabel indicator','B4\nHealth risk','B5\nNatural label','B6\nWhole food','B7\n% calories','B8\nLow-fat claim','B9\nUPF vs whole','B10\nLabel strategy'],
+    datasets: [
+      { label: 'Pre', data: [76,44,76,84,80,64,40,64,72,64], backgroundColor: GREEN_LIGHT, borderRadius: 3 },
+      { label: 'Post', data: [83,33,50,83,67,50,83,50,83,67], backgroundColor: GREEN, borderRadius: 3 },
+    ]
+  },
+  options: {
+    responsive: true, maintainAspectRatio: false,
+    plugins: { legend: { position: 'top', labels: { boxWidth: 12 } } },
+    scales: {
+      x: { grid: { display: false }, ticks: { maxRotation: 45, font: { size: 9 } } },
+      y: { beginAtZero: true, max: 100, ticks: { callback: v => v + '%' } }
+    }
+  }
+});
+
+// ── D1 self-efficacy rows ───────────────────────────────────────
+const d1Data = [
+  { label: 'Know diff UPF vs processed', pre: 3.92, post: 4.00 },
+  { label: 'Confident reading labels', pre: 3.92, post: 4.00 },
+  { label: 'Diet affects long-term health', pre: 4.16, post: 3.83 },
+  { label: 'Want whole foods but difficult', pre: 3.36, post: 3.17 },
+  { label: 'Have cooking skills', pre: 3.62, post: 4.40 },
+  { label: 'Cost is major barrier', pre: 3.92, post: 3.83 },
+];
+const d1Container = document.getElementById('d1Rows');
+d1Data.forEach(item => {
+  const delta = (item.post - item.pre).toFixed(2);
+  const cls = delta > 0 ? 'delta-pos' : delta < 0 ? 'delta-neg' : 'delta-neu';
+  const sign = delta > 0 ? '+' : '';
+  d1Container.innerHTML += `
+    <div class="compare-row">
+      <div class="compare-label">${item.label}</div>
+      <div class="compare-bars">
+        <div class="bar-wrap">
+          <div class="bar-track"><div class="bar-fill-pre" style="width:${item.pre/5*100}%"></div></div>
+          <div style="font-size:0.72rem;color:var(--text-light);margin-top:2px">${item.pre}</div>
+        </div>
+        <div class="bar-wrap">
+          <div class="bar-track"><div class="bar-fill-post" style="width:${item.post/5*100}%"></div></div>
+          <div style="font-size:0.72rem;color:var(--text-light);margin-top:2px">${item.post}</div>
+        </div>
+      </div>
+      <span class="${cls}">${sign}${delta}</span>
+    </div>`;
+});
+
+// ── D2 confidence rows ──────────────────────────────────────────
+const d2Data = [
+  { label: 'Identify UPF on label', pre: 3.96, post: 4.33 },
+  { label: 'Prepare whole-food meal', pre: 3.76, post: 4.17 },
+  { label: 'Healthy choices on budget', pre: 3.56, post: 3.67 },
+  { label: 'Explain UPF harms to friend', pre: 3.44, post: 3.50 },
+];
+const d2Container = document.getElementById('d2Rows');
+d2Data.forEach(item => {
+  const delta = (item.post - item.pre).toFixed(2);
+  const cls = delta > 0 ? 'delta-pos' : delta < 0 ? 'delta-neg' : 'delta-neu';
+  const sign = delta > 0 ? '+' : '';
+  d2Container.innerHTML += `
+    <div class="compare-row">
+      <div class="compare-label">${item.label}</div>
+      <div class="compare-bars">
+        <div class="bar-wrap">
+          <div class="bar-track"><div class="bar-fill-pre" style="width:${item.pre/5*100}%"></div></div>
+          <div style="font-size:0.72rem;color:var(--text-light);margin-top:2px">${item.pre}</div>
+        </div>
+        <div class="bar-wrap">
+          <div class="bar-track"><div class="bar-fill-post" style="width:${item.post/5*100}%"></div></div>
+          <div style="font-size:0.72rem;color:var(--text-light);margin-top:2px">${item.post}</div>
+        </div>
+      </div>
+      <span class="${cls}">${sign}${delta}</span>
+    </div>`;
+});
+
+// ── Behavior change intentions ──────────────────────────────────
+new Chart(document.getElementById('chartIntentions'), {
+  type: 'bar',
+  data: {
+    labels: ['Reduce UPF intake', 'Read ingredient labels', 'Share with friend/family', 'Visit NutriGators site', 'Cook whole-food meals'],
+    datasets: [{ data: [4.17, 4.17, 4.00, 4.00, 3.83], backgroundColor: GREEN, borderRadius: 4 }]
+  },
+  options: {
+    indexAxis: 'y',
+    responsive: true, maintainAspectRatio: false,
+    plugins: { legend: { display: false } },
+    scales: {
+      x: { min: 0, max: 5, grid: { color: '#eef0ee' }, ticks: { stepSize: 1 } },
+      y: { grid: { display: false }, ticks: { font: { size: 10 } } }
+    }
+  }
+});
+</script>
+</body>
+</html>
